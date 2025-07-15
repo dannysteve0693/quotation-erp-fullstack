@@ -1,0 +1,48 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+.npm/
+.yarn/
+.cache/
+.eslintcache
+.claude
+
+# Environment variables
+# This is crucial as it contains sensitive database credentials and JWT secret
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Docker
+# Ignore Docker build context files that are not part of the source
+# For example, if you copy .env into the Dockerfile, you might want to ignore it here
+# but include it in the build context. For now, .env is already ignored.
+*.dockerignore # The .dockerignore file itself should not be ignored
+Dockerfile.bak
+docker-compose.override.yml # If you use an override file for local development
+.docker/
+
+# IDE and OS specific files
+.vscode/        # VS Code settings
+.idea/          # IntelliJ IDEA settings
+.DS_Store       # macOS specific
+Thumbs.db       # Windows specific
+npm-shrinkwrap.json # If you use shrinkwrap (less common with package-lock.json)
+
+# Test coverage reports
+coverage/
