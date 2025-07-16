@@ -54,8 +54,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
         currentPage: 'dashboard',
       };
     case 'LOGOUT':
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
       return {
         ...state,
         user: null,
@@ -65,7 +67,9 @@ function appReducer(state: AppState, action: AppAction): AppState {
         selectedSalesOrderId: null,
       };
     case 'SET_THEME':
-      localStorage.setItem('theme', action.payload);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('theme', action.payload);
+      }
       return {
         ...state,
         theme: action.payload,
@@ -116,12 +120,20 @@ export function AppProvider({ children }: AppProviderProps) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   useEffect(() => {
+    // Check if we're in the browser
+    if (typeof window === 'undefined') return;
+    
     const savedTheme = localStorage.getItem('theme') as Theme;
     const savedToken = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
 
     if (savedTheme) {
       dispatch({ type: 'SET_THEME', payload: savedTheme });
+    } else {
+      // Set default theme based on system preference
+      const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultTheme = systemPrefersDark ? 'dark' : 'light';
+      dispatch({ type: 'SET_THEME', payload: defaultTheme });
     }
 
     if (savedToken && savedUser) {
@@ -136,12 +148,17 @@ export function AppProvider({ children }: AppProviderProps) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', state.theme === 'dark');
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.toggle('dark', state.theme === 'dark');
+      console.log('Theme changed to:', state.theme);
+    }
   }, [state.theme]);
 
   const login = (user: User, token: string) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+    }
     dispatch({ type: 'SET_USER', payload: { user, token } });
   };
 
@@ -150,7 +167,9 @@ export function AppProvider({ children }: AppProviderProps) {
   };
 
   const toggleTheme = () => {
-    dispatch({ type: 'SET_THEME', payload: state.theme === 'light' ? 'dark' : 'light' });
+    const newTheme = state.theme === 'light' ? 'dark' : 'light';
+    console.log('Toggling theme from', state.theme, 'to', newTheme);
+    dispatch({ type: 'SET_THEME', payload: newTheme });
   };
 
   const navigateTo = (page: Page) => {

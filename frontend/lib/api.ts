@@ -29,10 +29,27 @@ class ApiClient {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Network error' }));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return data;
+  }
+
+  private async handleArrayResponse<T>(response: Response): Promise<T[]> {
+    const data = await this.handleResponse<T[] | { [key: string]: T[] }>(response);
+    
+    // If response is wrapped in an object (e.g., { quotations: [...] })
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      const keys = Object.keys(data);
+      const arrayKey = keys.find(key => Array.isArray(data[key as keyof typeof data]));
+      if (arrayKey) {
+        return data[arrayKey as keyof typeof data] as T[];
+      }
+    }
+    
+    // If response is directly an array
+    return Array.isArray(data) ? data : [];
   }
 
   // Auth endpoints
@@ -63,7 +80,7 @@ class ApiClient {
       headers: this.getHeaders(token),
     });
 
-    return this.handleResponse<Product[]>(response);
+    return this.handleArrayResponse<Product>(response);
   }
 
   async createProduct(data: CreateProductData, token: string): Promise<Product> {
@@ -105,7 +122,7 @@ class ApiClient {
       headers: this.getHeaders(token),
     });
 
-    return this.handleResponse<Quotation[]>(response);
+    return this.handleArrayResponse<Quotation>(response);
   }
 
   async getQuotationById(id: number, token: string): Promise<Quotation> {
@@ -154,7 +171,7 @@ class ApiClient {
       headers: this.getHeaders(token),
     });
 
-    return this.handleResponse<SalesOrder[]>(response);
+    return this.handleArrayResponse<SalesOrder>(response);
   }
 
   async getSalesOrderById(id: number, token: string): Promise<SalesOrder> {

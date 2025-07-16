@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { Product, CreateProductData } from '@/types';
-import { formatCurrency, validateRequired, validatePositiveNumber, validatePositiveInteger } from '@/lib/utils';
+import { formatCurrency, validateRequired, validatePositiveNumber, validatePositiveInteger, safeArray, safeFilter } from '@/lib/utils';
 import { Plus, Edit, Trash2, Search, Package, DollarSign, Hash } from 'lucide-react';
 import { LoadingCard } from '@/components/ui/loading-card';
 
@@ -47,9 +47,10 @@ export function ProductManagement() {
     setIsLoading(true);
     try {
       const data = await apiClient.getProducts(state.token);
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load products:', error);
+      setProducts([]);
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +164,7 @@ export function ProductManagement() {
     }
   };
 
-  const filteredProducts = products.filter(product =>
+  const filteredProducts = safeArray(products).filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );

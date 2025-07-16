@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { Quotation } from '@/types';
-import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { formatCurrency, formatDate, getStatusColor, safeArray, safeFilter } from '@/lib/utils';
 import { Search, Plus, Eye, Check, X, Filter, FileText, Calendar, DollarSign } from 'lucide-react';
 import { LoadingCard } from '@/components/ui/loading-card';
 
@@ -32,9 +32,10 @@ export function QuotationList() {
     setIsLoading(true);
     try {
       const data = await apiClient.getQuotations(state.token);
-      setQuotations(data);
+      setQuotations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load quotations:', error);
+      setQuotations([]);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +74,7 @@ export function QuotationList() {
     }
   };
 
-  const filteredAndSortedQuotations = quotations
+  const filteredAndSortedQuotations = safeArray(quotations)
     .filter(quotation => {
       const matchesSearch = quotation.id.toString().includes(searchTerm) ||
         formatCurrency(quotation.total_amount).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -96,11 +97,11 @@ export function QuotationList() {
     });
 
   const statusCounts = {
-    all: quotations.length,
-    pending: quotations.filter(q => q.status === 'pending').length,
-    approved: quotations.filter(q => q.status === 'approved').length,
-    rejected: quotations.filter(q => q.status === 'rejected').length,
-    converted_to_order: quotations.filter(q => q.status === 'converted_to_order').length,
+    all: safeArray(quotations).length,
+    pending: safeFilter(quotations, q => q.status === 'pending').length,
+    approved: safeFilter(quotations, q => q.status === 'approved').length,
+    rejected: safeFilter(quotations, q => q.status === 'rejected').length,
+    converted_to_order: safeFilter(quotations, q => q.status === 'converted_to_order').length,
   };
 
   if (isLoading) {

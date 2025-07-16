@@ -66,3 +66,19 @@ export function validatePositiveNumber(value: number): boolean {
 export function validatePositiveInteger(value: number): boolean {
   return Number.isInteger(value) && value > 0
 }
+
+export function safeArray<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : []
+}
+
+export function safeFilter<T>(array: T[] | null | undefined, predicate: (item: T) => boolean): T[] {
+  return safeArray(array).filter(predicate)
+}
+
+export function safeMap<T, U>(array: T[] | null | undefined, mapper: (item: T) => U): U[] {
+  return safeArray(array).map(mapper)
+}
+
+export function safeReduce<T, U>(array: T[] | null | undefined, reducer: (acc: U, item: T) => U, initialValue: U): U {
+  return safeArray(array).reduce(reducer, initialValue)
+}

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { Quotation, Product, SalesOrder } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, safeArray, safeFilter, safeReduce } from '@/lib/utils';
 import { Package, FileText, ShoppingCart, TrendingUp, Plus, Eye } from 'lucide-react';
 import { LoadingCard } from '@/components/ui/loading-card';
 
@@ -27,16 +27,33 @@ export function Dashboard() {
     setIsLoading(true);
     try {
       const [quotationsData, productsData, salesOrdersData] = await Promise.all([
-        apiClient.getQuotations(state.token),
-        state.user?.role === 'sales' ? apiClient.getProducts(state.token) : Promise.resolve([]),
-        state.user?.role === 'sales' ? apiClient.getSalesOrders(state.token) : Promise.resolve([]),
+        apiClient.getQuotations(state.token).catch(error => {
+          console.error('Failed to load quotations:', error);
+          return [];
+        }),
+        state.user?.role === 'sales' 
+          ? apiClient.getProducts(state.token).catch(error => {
+              console.error('Failed to load products:', error);
+              return [];
+            })
+          : Promise.resolve([]),
+        state.user?.role === 'sales' 
+          ? apiClient.getSalesOrders(state.token).catch(error => {
+              console.error('Failed to load sales orders:', error);
+              return [];
+            })
+          : Promise.resolve([]),
       ]);
 
-      setQuotations(quotationsData);
-      setProducts(productsData);
-      setSalesOrders(salesOrdersData);
+      setQuotations(Array.isArray(quotationsData) ? quotationsData : []);
+      setProducts(Array.isArray(productsData) ? productsData : []);
+      setSalesOrders(Array.isArray(salesOrdersData) ? salesOrdersData : []);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      // Set empty arrays as fallback
+      setQuotations([]);
+      setProducts([]);
+      setSalesOrders([]);
     } finally {
       setIsLoading(false);
     }
@@ -52,32 +69,32 @@ export function Dashboard() {
     navigateTo('sales-order-detail');
   };
 
-  const pendingQuotations = quotations.filter(q => q.status === 'pending');
-  const recentQuotations = quotations.slice(0, 5);
-  const recentSalesOrders = salesOrders.slice(0, 5);
+  const pendingQuotations = safeFilter(quotations, q => q.status === 'pending');
+  const recentQuotations = safeArray(quotations).slice(0, 5);
+  const recentSalesOrders = safeArray(salesOrders).slice(0, 5);
 
   const stats = [
     {
       title: 'Total Quotations',
-      value: quotations.length,
+      value: safeArray(quotations).length,
       icon: FileText,
       description: `${pendingQuotations.length} pending`,
     },
     ...(state.user?.role === 'sales' ? [{
       title: 'Products',
-      value: products.length,
+      value: safeArray(products).length,
       icon: Package,
-      description: `${products.filter(p => p.stock_quantity > 0).length} in stock`,
+      description: `${safeFilter(products, p => p.stock_quantity > 0).length} in stock`,
     }] : []),
     ...(state.user?.role === 'sales' ? [{
       title: 'Sales Orders',
-      value: salesOrders.length,
+      value: safeArray(salesOrders).length,
       icon: ShoppingCart,
-      description: `${salesOrders.filter(so => so.status === 'pending').length} pending`,
+      description: `${safeFilter(salesOrders, so => so.status === 'pending').length} pending`,
     }] : []),
     {
       title: 'Total Value',
-      value: formatCurrency(quotations.reduce((sum, q) => sum + q.total_amount, 0)),
+      value: formatCurrency(safeReduce(quotations, (sum, q) => sum + q.total_amount, 0)),
       icon: TrendingUp,
       description: 'All quotations',
     },
@@ -92,13 +109,13 @@ export function Dashboard() {
             Welcome back, {state.user?.first_name} {state.user?.last_name}
           </p>
         </div>
-        
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <LoadingCard key={i} />
           ))}
         </div>
-        
+
         <div className="grid gap-8 md:grid-cols-2">
           <LoadingCard />
           <LoadingCard />
@@ -116,7 +133,7 @@ export function Dashboard() {
             Welcome back, {state.user?.first_name} {state.user?.last_name}
           </p>
         </div>
-        
+
         <div className="flex gap-2">
           {state.user?.role === 'customer' && (
             <Button onClick={() => navigateTo('quotation-form')}>
@@ -159,8 +176,8 @@ export function Dashboard() {
           <CardHeader>
             <CardTitle>Recent Quotations</CardTitle>
             <CardDescription>
-              {state.user?.role === 'customer' 
-                ? 'Your latest quotation requests' 
+              {state.user?.role === 'customer'
+                ? 'Your latest quotation requests'
                 : 'Latest quotations from customers'}
             </CardDescription>
           </CardHeader>
@@ -176,13 +193,12 @@ export function Dashboard() {
                       <p className="text-sm text-muted-foreground">
                         {formatCurrency(quotation.total_amount)}
                       </p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        quotation.status === 'pending' 
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${quotation.status === 'pending'
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                           : quotation.status === 'approved'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}>
                         {quotation.status}
                       </span>
                     </div>
@@ -230,13 +246,12 @@ export function Dashboard() {
                         <p className="text-sm text-muted-foreground">
                           {formatCurrency(salesOrder.total_amount)}
                         </p>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          salesOrder.status === 'pending' 
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${salesOrder.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                             : salesOrder.status === 'confirmed'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}>
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                          }`}>
                           {salesOrder.status}
                         </span>
                       </div>
@@ -266,16 +281,16 @@ export function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button 
-                className="w-full justify-start" 
+              <Button
+                className="w-full justify-start"
                 variant="ghost"
                 onClick={() => navigateTo('quotation-form')}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Create New Quotation
               </Button>
-              <Button 
-                className="w-full justify-start" 
+              <Button
+                className="w-full justify-start"
                 variant="ghost"
                 onClick={() => navigateTo('quotations')}
               >
