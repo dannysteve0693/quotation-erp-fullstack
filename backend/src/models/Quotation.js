@@ -65,15 +65,7 @@ const Quotation = sequelize.define('Quotation', {
   tableName: 'quotations',
   timestamps: true,
   createdAt: 'created_at',
-  updatedAt: 'updated_at',
-  hooks: {
-    beforeCreate: async (quotation) => {
-      if (!quotation.quotation_number) {
-        const timestamp = Date.now();
-        quotation.quotation_number = `Q-${timestamp}`;
-      }
-    }
-  }
+  updatedAt: 'updated_at'
 });
 
 module.exports = Quotation;

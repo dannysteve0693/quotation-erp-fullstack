@@ -38,7 +38,12 @@ const createQuotation = async (req, res) => {
       total_amount += sub_total;
     }
 
+    // Generate quotation number
+    const timestamp = Date.now();
+    const quotationNumber = `QUO-${new Date().getFullYear()}-${String(timestamp).slice(-6)}`;
+
     const quotation = await Quotation.create({
+      quotation_number: quotationNumber,
       customer_id: req.user.id,
       total_amount: total_amount,
       notes,

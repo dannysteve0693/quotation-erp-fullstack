@@ -5,22 +5,26 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { Product } from '@/types';
 import { formatCurrency, validatePositiveInteger, safeArray } from '@/lib/utils';
-import { Plus, Minus, ShoppingCart, Package, ArrowLeft, Loader2 } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, Package, ArrowLeft, Loader2, Calendar } from 'lucide-react';
 
 interface QuotationItem {
   product_id: string;
   product: Product;
   quantity: number;
   unit_price: number;
+  discount_percentage: number;
 }
 
 interface FormErrors {
   items?: string;
+  notes?: string;
+  valid_until?: string;
   general?: string;
 }
 
@@ -28,6 +32,8 @@ export function QuotationForm() {
   const { state, navigateTo } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
   const [items, setItems] = useState<QuotationItem[]>([]);
+  const [notes, setNotes] = useState('');
+  const [validUntil, setValidUntil] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -72,7 +78,8 @@ export function QuotationForm() {
           product_id: product.id,
           product,
           quantity: 1,
-          unit_price: product.price
+          unit_price: product.price,
+          discount_percentage: 0
         }];
         console.log('Adding item, new items:', newItems);
         return newItems;
@@ -121,8 +128,25 @@ export function QuotationForm() {
     setUpdateKey(prev => prev + 1);
   };
 
+  const calculateItemSubTotal = (item: QuotationItem) => {
+    const gross = item.unit_price * item.quantity;
+    const discount = (gross * item.discount_percentage) / 100;
+    return gross - discount;
+  };
+
   const calculateTotal = () => {
-    return safeArray(items).reduce((total, item) => total + (item.unit_price * item.quantity), 0);
+    return safeArray(items).reduce((total, item) => total + calculateItemSubTotal(item), 0);
+  };
+
+  const updateDiscount = (productId: string, discountPercentage: number) => {
+    if (discountPercentage < 0 || discountPercentage > 100) return;
+    
+    setItems(prev => prev.map(item =>
+      item.product_id === productId
+        ? { ...item, discount_percentage: discountPercentage }
+        : item
+    ));
+    setUpdateKey(prev => prev + 1);
   };
 
   const validateForm = (): boolean => {
@@ -158,13 +182,18 @@ export function QuotationForm() {
     setErrors({});
 
     try {
-      await apiClient.createQuotation({
+      const quotationData = {
         items: items.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
           unit_price: item.unit_price,
+          discount_percentage: item.discount_percentage || 0
         })),
-      }, state.token);
+        notes: notes.trim() || undefined,
+        valid_until: validUntil || undefined
+      };
+      
+      await apiClient.createQuotation(quotationData, state.token);
 
       navigateTo('quotations');
     } catch (error) {
@@ -299,32 +328,49 @@ export function QuotationForm() {
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <Input
-                          type="number"
-                          min="1"
-                          max={item.product.stock_quantity}
-                          value={item.quantity}
-                          onChange={(e) => updateQuantity(item.product_id, parseInt(e.target.value) || 1)}
-                          className="w-20 text-center"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                          disabled={item.quantity >= item.product.stock_quantity}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
+                        <div className="flex flex-col space-y-1">
+                          <div className="flex items-center space-x-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <Input
+                              type="number"
+                              min="1"
+                              max={item.product.stock_quantity}
+                              value={item.quantity}
+                              onChange={(e) => updateQuantity(item.product_id, parseInt(e.target.value) || 1)}
+                              className="w-16 text-center"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                              disabled={item.quantity >= item.product.stock_quantity}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.1"
+                              placeholder="0"
+                              value={item.discount_percentage}
+                              onChange={(e) => updateDiscount(item.product_id, parseFloat(e.target.value) || 0)}
+                              className="w-16 text-center text-xs"
+                            />
+                            <span className="text-xs text-muted-foreground">% off</span>
+                          </div>
+                        </div>
                         <Button
                           type="button"
                           variant="ghost"
@@ -365,11 +411,21 @@ export function QuotationForm() {
                       <p className="font-medium">{item.product.name}</p>
                       <p className="text-sm text-muted-foreground">
                         {item.quantity} × {formatCurrency(item.unit_price)}
+                        {item.discount_percentage > 0 && (
+                          <span className="text-green-600 ml-1">
+                            ({item.discount_percentage}% off)
+                          </span>
+                        )}
                       </p>
                     </div>
                     <div className="text-right">
+                      {item.discount_percentage > 0 && (
+                        <p className="text-sm text-muted-foreground line-through">
+                          {formatCurrency(item.unit_price * item.quantity)}
+                        </p>
+                      )}
                       <p className="font-medium">
-                        {formatCurrency(item.unit_price * item.quantity)}
+                        {formatCurrency(calculateItemSubTotal(item))}
                       </p>
                     </div>
                   </div>
@@ -383,6 +439,45 @@ export function QuotationForm() {
                     </p>
                   </div>
                 )}
+              </div>
+
+              {/* Additional Fields */}
+              <div className="space-y-4 pt-4 border-t">
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notes (Optional)</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Add any special requirements or notes for this quotation..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className={errors.notes ? 'border-red-500' : ''}
+                    rows={3}
+                  />
+                  {errors.notes && (
+                    <p className="text-sm text-red-500">{errors.notes}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="valid_until">Valid Until (Optional)</Label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="valid_until"
+                      type="date"
+                      value={validUntil}
+                      onChange={(e) => setValidUntil(e.target.value)}
+                      className={errors.valid_until ? 'border-red-500 pl-10' : 'pl-10'}
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                  {errors.valid_until && (
+                    <p className="text-sm text-red-500">{errors.valid_until}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty for no expiration date
+                  </p>
+                </div>
               </div>
 
               {items.length > 0 && (
