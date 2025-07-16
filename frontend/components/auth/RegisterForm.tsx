@@ -12,8 +12,6 @@ import { validateEmail, validateRequired, validatePassword } from '@/lib/utils';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface FormErrors {
-  first_name?: string;
-  last_name?: string;
   email?: string;
   password?: string;
   role?: string;
@@ -23,8 +21,6 @@ interface FormErrors {
 export function RegisterForm() {
   const { login, navigateTo } = useApp();
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
     email: '',
     password: '',
     role: '' as 'customer' | 'sales' | '',
@@ -35,14 +31,6 @@ export function RegisterForm() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-
-    if (!validateRequired(formData.first_name)) {
-      newErrors.first_name = 'First name is required';
-    }
-
-    if (!validateRequired(formData.last_name)) {
-      newErrors.last_name = 'Last name is required';
-    }
 
     if (!validateRequired(formData.email)) {
       newErrors.email = 'Email is required';
@@ -76,8 +64,6 @@ export function RegisterForm() {
 
     try {
       const response = await apiClient.register({
-        first_name: formData.first_name,
-        last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
         role: formData.role as 'customer' | 'sales',
@@ -140,37 +126,6 @@ export function RegisterForm() {
                 </div>
               )}
               
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="first_name">First Name</Label>
-                  <Input
-                    id="first_name"
-                    type="text"
-                    placeholder="John"
-                    value={formData.first_name}
-                    onChange={handleInputChange('first_name')}
-                    className={errors.first_name ? 'border-red-500' : ''}
-                  />
-                  {errors.first_name && (
-                    <p className="text-sm text-red-500">{errors.first_name}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="last_name">Last Name</Label>
-                  <Input
-                    id="last_name"
-                    type="text"
-                    placeholder="Doe"
-                    value={formData.last_name}
-                    onChange={handleInputChange('last_name')}
-                    className={errors.last_name ? 'border-red-500' : ''}
-                  />
-                  {errors.last_name && (
-                    <p className="text-sm text-red-500">{errors.last_name}</p>
-                  )}
-                </div>
-              </div>
               
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

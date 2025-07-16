@@ -15,8 +15,10 @@ import { LoadingCard } from '@/components/ui/loading-card';
 interface FormErrors {
   name?: string;
   description?: string;
+  sku?: string;
   price?: string;
   stock_quantity?: string;
+  category?: string;
   general?: string;
 }
 
@@ -32,8 +34,10 @@ export function ProductManagement() {
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
+    sku: '',
     price: 0,
     stock_quantity: 0,
+    category: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -65,6 +69,10 @@ export function ProductManagement() {
 
     if (!validateRequired(formData.description)) {
       newErrors.description = 'Description is required';
+    }
+
+    if (!validateRequired(formData.sku)) {
+      newErrors.sku = 'SKU is required';
     }
 
     if (!validatePositiveNumber(formData.price)) {
@@ -113,8 +121,10 @@ export function ProductManagement() {
     setFormData({
       name: product.name,
       description: product.description,
+      sku: product.sku,
       price: product.price,
       stock_quantity: product.stock_quantity,
+      category: product.category || '',
     });
     setIsFormOpen(true);
   };
@@ -136,8 +146,10 @@ export function ProductManagement() {
     setFormData({
       name: '',
       description: '',
+      sku: '',
       price: 0,
       stock_quantity: 0,
+      category: '',
     });
     setErrors({});
     setEditingProduct(null);
@@ -156,7 +168,7 @@ export function ProductManagement() {
       [field]: value,
     }));
     
-    if (errors[field]) {
+    if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
         [field]: undefined,
@@ -166,7 +178,9 @@ export function ProductManagement() {
 
   const filteredProducts = safeArray(products).filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   if (isLoading) {
@@ -253,6 +267,23 @@ export function ProductManagement() {
                 </div>
                 
                 <div className="space-y-2">
+                  <Label htmlFor="sku">SKU</Label>
+                  <Input
+                    id="sku"
+                    type="text"
+                    placeholder="Enter product SKU"
+                    value={formData.sku}
+                    onChange={handleInputChange('sku')}
+                    className={errors.sku ? 'border-red-500' : ''}
+                  />
+                  {errors.sku && (
+                    <p className="text-sm text-red-500">{errors.sku}</p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
                   <Label htmlFor="price">Price ($)</Label>
                   <Input
                     id="price"
@@ -266,6 +297,21 @@ export function ProductManagement() {
                   />
                   {errors.price && (
                     <p className="text-sm text-red-500">{errors.price}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Input
+                    id="category"
+                    type="text"
+                    placeholder="Enter product category (optional)"
+                    value={formData.category || ''}
+                    onChange={handleInputChange('category')}
+                    className={errors.category ? 'border-red-500' : ''}
+                  />
+                  {errors.category && (
+                    <p className="text-sm text-red-500">{errors.category}</p>
                   )}
                 </div>
               </div>
@@ -347,22 +393,35 @@ export function ProductManagement() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-lg font-semibold">
-                      {formatCurrency(product.price)}
-                    </span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-lg font-semibold">
+                        {formatCurrency(product.price)}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Hash className="h-4 w-4 text-muted-foreground" />
+                      <span className={`font-medium ${
+                        product.stock_quantity > 0 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-red-600 dark:text-red-400'
+                      }`}>
+                        {product.stock_quantity} in stock
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Hash className="h-4 w-4 text-muted-foreground" />
-                    <span className={`font-medium ${
-                      product.stock_quantity > 0 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
-                      {product.stock_quantity} in stock
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      SKU: <span className="font-mono">{product.sku}</span>
                     </span>
+                    {product.category && (
+                      <span className="text-muted-foreground">
+                        Category: <span className="font-medium">{product.category}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
                 

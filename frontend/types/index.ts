@@ -3,6 +3,7 @@ export interface User {
   email: string;
   password_hash: string;
   role: 'customer' | 'sales';
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -23,8 +24,11 @@ export interface Product {
   id: string;
   name: string;
   description: string;
+  sku: string;
   price: number;
   stock_quantity: number;
+  is_active: boolean;
+  category?: string;
   created_at: string;
   updated_at: string;
 }
@@ -111,19 +115,18 @@ export interface LoginData {
 }
 
 export interface RegisterData {
-  first_name: string;
-  last_name: string;
   email: string;
   password: string;
   role: 'customer' | 'sales';
-  phone?: string;
 }
 
 export interface CreateProductData {
   name: string;
   description: string;
+  sku: string;
   price: number;
   stock_quantity: number;
+  category?: string;
 }
 
 export interface CreateQuotationData {

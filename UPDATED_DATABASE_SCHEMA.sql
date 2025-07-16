@@ -21,6 +21,7 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role user_role NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,8 +32,11 @@ CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
+    sku VARCHAR(255) UNIQUE NOT NULL,
     price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
     stock_quantity INTEGER DEFAULT 0 CHECK (stock_quantity >= 0),
+    is_active BOOLEAN DEFAULT TRUE,
+    category VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -121,6 +125,7 @@ CREATE TABLE quotation_audit_trail (
 -- These indexes can improve query performance on frequently accessed columns.
 
 CREATE INDEX idx_users_email ON users (email);
+CREATE INDEX idx_products_sku ON products (sku);
 CREATE INDEX idx_quotations_customer_id ON quotations (customer_id);
 CREATE INDEX idx_quotations_status ON quotations (status);
 CREATE INDEX idx_quotations_quotation_number ON quotations (quotation_number); -- Added index for quotation_number
