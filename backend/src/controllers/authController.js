@@ -8,7 +8,7 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
   try {
-    const { email, password, role, first_name, last_name, phone } = req.body;
+    const { email, password, role } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -20,10 +20,7 @@ const register = async (req, res) => {
     const user = await User.create({
       email,
       password_hash: password,
-      role,
-      first_name,
-      last_name,
-      phone
+      role
     });
 
     const token = generateToken(user.id);
@@ -34,10 +31,7 @@ const register = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        phone: user.phone
+        role: user.role
       }
     });
   } catch (error) {
@@ -74,10 +68,7 @@ const login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        phone: user.phone
+        role: user.role
       }
     });
   } catch (error) {
@@ -113,7 +104,6 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { first_name, last_name, phone } = req.body;
     const user = await User.findByPk(req.user.id);
 
     if (!user) {
@@ -122,21 +112,12 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    await user.update({
-      first_name,
-      last_name,
-      phone
-    });
-
     res.json({
-      message: 'Profile updated successfully',
+      message: 'Profile retrieved successfully',
       user: {
         id: user.id,
         email: user.email,
-        role: user.role,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        phone: user.phone
+        role: user.role
       }
     });
   } catch (error) {

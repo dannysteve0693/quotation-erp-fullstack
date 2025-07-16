@@ -24,8 +24,8 @@ const getSalesOrders = async (req, res) => {
     const { count, rows } = await SalesOrder.findAndCountAll({
       where,
       include: [
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
         { 
           model: Quotation, 
           as: 'quotation', 
@@ -65,8 +65,8 @@ const getSalesOrderById = async (req, res) => {
           as: 'items',
           include: [{ model: Product, as: 'product' }]
         },
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
         { 
           model: Quotation, 
           as: 'quotation', 
@@ -131,8 +131,8 @@ const updateSalesOrderStatus = async (req, res) => {
           as: 'items',
           include: [{ model: Product, as: 'product' }]
         },
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
         { 
           model: Quotation, 
           as: 'quotation', 
@@ -165,8 +165,8 @@ const getSalesOrdersByQuotation = async (req, res) => {
           as: 'items',
           include: [{ model: Product, as: 'product' }]
         },
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
         { 
           model: Quotation, 
           as: 'quotation', 

@@ -122,9 +122,9 @@ const getQuotations = async (req, res) => {
     const { count, rows } = await Quotation.findAndCountAll({
       where,
       include: [
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'approver', attributes: ['id', 'email', 'first_name', 'last_name'] }
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
+        { model: User, as: 'approver', attributes: ['id', 'email'] }
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -159,13 +159,13 @@ const getQuotationById = async (req, res) => {
           as: 'items',
           include: [{ model: Product, as: 'product' }]
         },
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'approver', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
+        { model: User, as: 'approver', attributes: ['id', 'email'] },
         {
           model: QuotationAuditTrail,
           as: 'auditTrail',
-          include: [{ model: User, as: 'user', attributes: ['id', 'email', 'first_name', 'last_name'] }],
+          include: [{ model: User, as: 'user', attributes: ['id', 'email'] }],
           order: [['changed_at', 'DESC']]
         }
       ]
@@ -286,9 +286,9 @@ const approveRejectQuotation = async (req, res) => {
           as: 'items',
           include: [{ model: Product, as: 'product' }]
         },
-        { model: User, as: 'customer', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'creator', attributes: ['id', 'email', 'first_name', 'last_name'] },
-        { model: User, as: 'approver', attributes: ['id', 'email', 'first_name', 'last_name'] },
+        { model: User, as: 'customer', attributes: ['id', 'email'] },
+        { model: User, as: 'creator', attributes: ['id', 'email'] },
+        { model: User, as: 'approver', attributes: ['id', 'email'] },
         { model: SalesOrder, as: 'salesOrder' }
       ]
     });

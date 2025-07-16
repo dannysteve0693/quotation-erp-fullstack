@@ -24,16 +24,6 @@ const validateRegistration = [
   body('role')
     .isIn(['customer', 'sales'])
     .withMessage('Role must be either customer or sales'),
-  body('first_name')
-    .optional()
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage('First name cannot be empty'),
-  body('last_name')
-    .optional()
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage('Last name cannot be empty'),
   handleValidationErrors
 ];
 
