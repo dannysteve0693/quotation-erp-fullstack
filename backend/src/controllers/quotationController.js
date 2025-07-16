@@ -237,9 +237,12 @@ const approveRejectQuotation = async (req, res) => {
     if (action === 'approve') {
       newStatus = 'approved';
       
+      const orderNumber = `SO-${Date.now()}`;
+      
       salesOrder = await SalesOrder.create({
         quotation_id: quotation.id,
         customer_id: quotation.customer_id,
+        order_number: orderNumber,
         total_amount: quotation.total_amount,
         created_by: req.user.id,
         notes: quotation.notes

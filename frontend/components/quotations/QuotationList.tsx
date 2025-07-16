@@ -76,10 +76,10 @@ export function QuotationList() {
 
   const filteredAndSortedQuotations = safeArray(quotations)
     .filter(quotation => {
-      const matchesSearch = quotation.quotation_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      const matchesSearch = (quotation.quotation_number || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         quotation.id.toString().includes(searchTerm) ||
         formatCurrency(quotation.total_amount).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (quotation.customer ? quotation.customer.email : '').toLowerCase().includes(searchTerm.toLowerCase());
+        (quotation.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || quotation.status === statusFilter;
       
@@ -211,7 +211,7 @@ export function QuotationList() {
                         {quotation.quotation_number}
                       </h3>
                       <Badge className={getStatusColor(quotation.status)}>
-                        {quotation.status.replace('_', ' ')}
+                        {(quotation.status || '').replace('_', ' ')}
                       </Badge>
                     </div>
                     
@@ -239,7 +239,7 @@ export function QuotationList() {
                     </div>
                     
                     <div className="text-sm text-muted-foreground">
-                      {quotation.items.length} item{quotation.items.length !== 1 ? 's' : ''}
+                      {quotation.items ? safeArray(quotation.items).length : 0} item{(quotation.items ? safeArray(quotation.items).length : 0) !== 1 ? 's' : ''}
                     </div>
                   </div>
                   

@@ -57,3 +57,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure dark mode styles are applied */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}

@@ -57,8 +57,8 @@ export interface Quotation {
   updated_at: string;
   approved_at?: string;
   customer?: User;
-  items: QuotationItem[];
-  audit_trail?: AuditTrail[];
+  items?: QuotationItem[];
+  auditTrail?: AuditTrail[];
 }
 
 export interface AuditTrail {

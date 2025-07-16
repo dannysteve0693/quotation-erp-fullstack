@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { SalesOrder } from '@/types';
-import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { formatCurrency, formatDate, getStatusColor, safeArray } from '@/lib/utils';
 import { ArrowLeft, User, Calendar, Package, DollarSign, FileText, Truck, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { LoadingCard } from '@/components/ui/loading-card';
 
@@ -179,7 +179,7 @@ export function SalesOrderDetail() {
               <div>
                 <p className="font-medium">Items</p>
                 <p className="text-sm text-muted-foreground">
-                  {salesOrder.items.length} item{salesOrder.items.length !== 1 ? 's' : ''}
+                  {safeArray(salesOrder.items).length} item{safeArray(salesOrder.items).length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
@@ -217,7 +217,7 @@ export function SalesOrderDetail() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {salesOrder.items.map((item) => (
+              {safeArray(salesOrder.items).map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
                     <h4 className="font-medium">{item.product?.name || 'Unknown Product'}</h4>

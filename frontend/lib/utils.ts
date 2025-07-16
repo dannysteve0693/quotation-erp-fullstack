@@ -13,17 +13,32 @@ export function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) {
+    return 'Invalid Date'
+  }
+  
+  const date = new Date(dateString)
+  
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid Date'
+  }
+  
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(dateString))
+  }).format(date)
 }
 
-export function getStatusColor(status: string): string {
+export function getStatusColor(status: string | undefined | null): string {
+  if (!status) {
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  }
+  
   switch (status.toLowerCase()) {
     case 'pending':
       return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
@@ -55,8 +70,8 @@ export function validatePassword(password: string): boolean {
   return password.length >= 6
 }
 
-export function validateRequired(value: string): boolean {
-  return value.trim().length > 0
+export function validateRequired(value: string | undefined | null): boolean {
+  return (value || '').trim().length > 0
 }
 
 export function validatePositiveNumber(value: number): boolean {

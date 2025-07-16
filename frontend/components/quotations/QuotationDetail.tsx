@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/context/AppContext';
 import { apiClient } from '@/lib/api';
 import { Quotation } from '@/types';
-import { formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { formatCurrency, formatDate, getStatusColor, safeArray } from '@/lib/utils';
 import { ArrowLeft, Check, X, ShoppingCart, User, Calendar, Package, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { LoadingCard } from '@/components/ui/loading-card';
 
@@ -142,7 +142,7 @@ export function QuotationDetail() {
               {quotation.quotation_number}
             </h1>
             <Badge className={getStatusColor(quotation.status)}>
-              {quotation.status.replace('_', ' ')}
+              {(quotation.status || '').replace('_', ' ')}
             </Badge>
           </div>
           <p className="text-muted-foreground">
@@ -246,7 +246,7 @@ export function QuotationDetail() {
               <div>
                 <p className="font-medium">Items</p>
                 <p className="text-sm text-muted-foreground">
-                  {quotation.items.length} item{quotation.items.length !== 1 ? 's' : ''}
+                  {safeArray(quotation.items).length} item{safeArray(quotation.items).length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
@@ -271,7 +271,7 @@ export function QuotationDetail() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {quotation.items.map((item) => (
+              {safeArray(quotation.items).map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
                     <h4 className="font-medium">{item.product?.name || 'Unknown Product'}</h4>
@@ -302,7 +302,7 @@ export function QuotationDetail() {
       </div>
 
       {/* Audit Trail */}
-      {quotation.audit_trail && quotation.audit_trail.length > 0 && (
+      {quotation.auditTrail && quotation.auditTrail.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Audit Trail</CardTitle>
@@ -312,7 +312,7 @@ export function QuotationDetail() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {quotation.audit_trail.map((entry) => (
+              {quotation.auditTrail.map((entry) => (
                 <div key={entry.id} className="flex items-start space-x-4 p-4 border rounded-lg">
                   <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
                   <div className="flex-1">

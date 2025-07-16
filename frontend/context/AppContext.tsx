@@ -150,7 +150,6 @@ export function AppProvider({ children }: AppProviderProps) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.documentElement.classList.toggle('dark', state.theme === 'dark');
-      console.log('Theme changed to:', state.theme);
     }
   }, [state.theme]);
 

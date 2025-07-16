@@ -177,10 +177,10 @@ export function ProductManagement() {
   };
 
   const filteredProducts = safeArray(products).filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()))
+    (product.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.sku || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
