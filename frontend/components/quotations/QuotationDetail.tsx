@@ -139,7 +139,7 @@ export function QuotationDetail() {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight">
-              Quotation #{quotation.id}
+              {quotation.quotation_number}
             </h1>
             <Badge className={getStatusColor(quotation.status)}>
               {quotation.status.replace('_', ' ')}
@@ -227,7 +227,7 @@ export function QuotationDetail() {
               <div className="flex items-center space-x-3">
                 <User className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{quotation.customer.first_name} {quotation.customer.last_name}</p>
+                  <p className="font-medium">{quotation.customer.email}</p>
                   <p className="text-sm text-muted-foreground">{quotation.customer.email}</p>
                 </div>
               </div>
@@ -284,7 +284,7 @@ export function QuotationDetail() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {formatCurrency(item.total_price)}
+                      {formatCurrency(item.sub_total)}
                     </p>
                   </div>
                 </div>
@@ -318,7 +318,7 @@ export function QuotationDetail() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <p className="font-medium">
-                        Status changed from "{entry.previous_status}" to "{entry.new_status}"
+                        Status changed from "{entry.old_status}" to "{entry.new_status}"
                       </p>
                       <time className="text-sm text-muted-foreground">
                         {formatDate(entry.changed_at)}
@@ -326,7 +326,7 @@ export function QuotationDetail() {
                     </div>
                     {entry.user && (
                       <p className="text-sm text-muted-foreground">
-                        Changed by {entry.user.first_name} {entry.user.last_name} ({entry.user.role})
+                        Changed by {entry.user.email} ({entry.user.role})
                       </p>
                     )}
                   </div>

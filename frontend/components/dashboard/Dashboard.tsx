@@ -90,7 +90,7 @@ export function Dashboard() {
       title: 'Sales Orders',
       value: safeArray(salesOrders).length,
       icon: ShoppingCart,
-      description: `${safeFilter(salesOrders, so => so.status === 'pending').length} pending`,
+      description: `${safeArray(salesOrders).length} total`,
     }] : []),
     {
       title: 'Total Value',
@@ -106,7 +106,7 @@ export function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, {state.user?.first_name} {state.user?.last_name}
+            Welcome back, {state.user?.email}
           </p>
         </div>
 
@@ -130,7 +130,7 @@ export function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, {state.user?.first_name} {state.user?.last_name}
+            Welcome back, {state.user?.email}
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export function Dashboard() {
                   <div key={quotation.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
-                        Quotation #{quotation.id}
+                        {quotation.quotation_number}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {formatCurrency(quotation.total_amount)}
@@ -246,13 +246,8 @@ export function Dashboard() {
                         <p className="text-sm text-muted-foreground">
                           {formatCurrency(salesOrder.total_amount)}
                         </p>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${salesOrder.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            : salesOrder.status === 'confirmed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                          }`}>
-                          {salesOrder.status}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          Created
                         </span>
                       </div>
                       <Button

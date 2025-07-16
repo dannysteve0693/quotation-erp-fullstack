@@ -20,8 +20,8 @@ interface AppState {
   token: string | null;
   theme: Theme;
   currentPage: Page;
-  selectedQuotationId: number | null;
-  selectedSalesOrderId: number | null;
+  selectedQuotationId: string | null;
+  selectedSalesOrderId: string | null;
   isLoading: boolean;
 }
 
@@ -30,8 +30,8 @@ type AppAction =
   | { type: 'LOGOUT' }
   | { type: 'SET_THEME'; payload: Theme }
   | { type: 'SET_PAGE'; payload: Page }
-  | { type: 'SET_SELECTED_QUOTATION'; payload: number | null }
-  | { type: 'SET_SELECTED_SALES_ORDER'; payload: number | null }
+  | { type: 'SET_SELECTED_QUOTATION'; payload: string | null }
+  | { type: 'SET_SELECTED_SALES_ORDER'; payload: string | null }
   | { type: 'SET_LOADING'; payload: boolean };
 
 const initialState: AppState = {
@@ -105,8 +105,8 @@ interface AppContextType {
   logout: () => void;
   toggleTheme: () => void;
   navigateTo: (page: Page) => void;
-  setSelectedQuotation: (id: number | null) => void;
-  setSelectedSalesOrder: (id: number | null) => void;
+  setSelectedQuotation: (id: string | null) => void;
+  setSelectedSalesOrder: (id: string | null) => void;
   setLoading: (loading: boolean) => void;
 }
 
@@ -176,11 +176,11 @@ export function AppProvider({ children }: AppProviderProps) {
     dispatch({ type: 'SET_PAGE', payload: page });
   };
 
-  const setSelectedQuotation = (id: number | null) => {
+  const setSelectedQuotation = (id: string | null) => {
     dispatch({ type: 'SET_SELECTED_QUOTATION', payload: id });
   };
 
-  const setSelectedSalesOrder = (id: number | null) => {
+  const setSelectedSalesOrder = (id: string | null) => {
     dispatch({ type: 'SET_SELECTED_SALES_ORDER', payload: id });
   };
 

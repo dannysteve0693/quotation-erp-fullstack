@@ -126,8 +126,8 @@ export function SalesOrderDetail() {
             <h1 className="text-3xl font-bold tracking-tight">
               Sales Order #{salesOrder.id}
             </h1>
-            <Badge className={getStatusColor(salesOrder.status)}>
-              {salesOrder.status}
+            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              Active
             </Badge>
           </div>
           <p className="text-muted-foreground">
@@ -139,25 +139,9 @@ export function SalesOrderDetail() {
         {state.user?.role === 'sales' && (
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Status:</span>
-            <Select
-              value={salesOrder.status}
-              onValueChange={handleStatusUpdate}
-              disabled={isUpdatingStatus}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <div className="flex items-center gap-2">
-                      <option.icon className="h-4 w-4" />
-                      {option.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs font-medium">
+              Active
+            </span>
           </div>
         )}
       </div>
@@ -176,7 +160,7 @@ export function SalesOrderDetail() {
               <div className="flex items-center space-x-3">
                 <User className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">{salesOrder.customer.first_name} {salesOrder.customer.last_name}</p>
+                  <p className="font-medium">{salesOrder.customer.email}</p>
                   <p className="text-sm text-muted-foreground">{salesOrder.customer.email}</p>
                 </div>
               </div>
@@ -246,7 +230,7 @@ export function SalesOrderDetail() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {formatCurrency(item.total_price)}
+                      {formatCurrency(item.sub_total)}
                     </p>
                   </div>
                 </div>
@@ -263,58 +247,25 @@ export function SalesOrderDetail() {
         </Card>
       </div>
 
-      {/* Order Status Timeline */}
+      {/* Order Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Order Status</CardTitle>
+          <CardTitle>Order Information</CardTitle>
           <CardDescription>
-            Current status and progress of this sales order
+            Additional details about this sales order
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            {statusOptions.slice(0, 4).map((status, index) => {
-              const StatusIcon = status.icon;
-              const isActive = salesOrder.status === status.value;
-              const isCompleted = statusOptions.findIndex(s => s.value === salesOrder.status) > index;
-              
-              return (
-                <div key={status.value} className="flex flex-col items-center flex-1">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-                    isActive 
-                      ? 'bg-primary text-primary-foreground' 
-                      : isCompleted 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    <StatusIcon className="h-5 w-5" />
-                  </div>
-                  <span className={`text-sm text-center ${
-                    isActive ? 'font-medium text-primary' : 'text-muted-foreground'
-                  }`}>
-                    {status.label}
-                  </span>
-                  {index < 3 && (
-                    <div className={`hidden sm:block w-full h-0.5 mt-4 -mr-10 ${
-                      isCompleted ? 'bg-green-500' : 'bg-muted'
-                    }`} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          
-          {salesOrder.status === 'cancelled' && (
-            <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                <AlertCircle className="h-5 w-5" />
-                <span className="font-medium">Order Cancelled</span>
-              </div>
-              <p className="text-sm text-red-600 dark:text-red-300 mt-1">
-                This order has been cancelled and will not be processed.
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Created:</span>
+              <span className="text-sm text-muted-foreground">{formatDate(salesOrder.created_at)}</span>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Total Amount:</span>
+              <span className="text-sm font-medium">{formatCurrency(salesOrder.total_amount)}</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

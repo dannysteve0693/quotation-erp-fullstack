@@ -76,9 +76,10 @@ export function QuotationList() {
 
   const filteredAndSortedQuotations = safeArray(quotations)
     .filter(quotation => {
-      const matchesSearch = quotation.id.toString().includes(searchTerm) ||
+      const matchesSearch = quotation.quotation_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        quotation.id.toString().includes(searchTerm) ||
         formatCurrency(quotation.total_amount).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (quotation.customer ? `${quotation.customer.first_name} ${quotation.customer.last_name}` : '').toLowerCase().includes(searchTerm.toLowerCase());
+        (quotation.customer ? quotation.customer.email : '').toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || quotation.status === statusFilter;
       
@@ -207,7 +208,7 @@ export function QuotationList() {
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">
                       <h3 className="text-lg font-semibold">
-                        Quotation #{quotation.id}
+                        {quotation.quotation_number}
                       </h3>
                       <Badge className={getStatusColor(quotation.status)}>
                         {quotation.status.replace('_', ' ')}
@@ -220,7 +221,7 @@ export function QuotationList() {
                           <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
                             <div className="w-2 h-2 rounded-full bg-primary"></div>
                           </div>
-                          <span>{quotation.customer.first_name} {quotation.customer.last_name}</span>
+                          <span>{quotation.customer.email}</span>
                         </div>
                       )}
                       

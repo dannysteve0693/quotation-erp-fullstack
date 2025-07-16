@@ -13,9 +13,10 @@ import { formatCurrency, validatePositiveInteger, safeArray } from '@/lib/utils'
 import { Plus, Minus, ShoppingCart, Package, ArrowLeft, Loader2 } from 'lucide-react';
 
 interface QuotationItem {
-  product_id: number;
+  product_id: string;
   product: Product;
   quantity: number;
+  unit_price: number;
 }
 
 interface FormErrors {
@@ -55,8 +56,8 @@ export function QuotationForm() {
 
   const addItem = (productId: string) => {
     if (!productId) return;
-    
-    const product = safeArray(products).find(p => p.id === parseInt(productId));
+
+    const product = safeArray(products).find(p => p.id === productId);
     if (!product) {
       console.error('Product not found:', productId);
       return;
@@ -71,6 +72,7 @@ export function QuotationForm() {
           product_id: product.id,
           product,
           quantity: 1,
+          unit_price: product.price
         }];
         console.log('Adding item, new items:', newItems);
         return newItems;
@@ -79,14 +81,15 @@ export function QuotationForm() {
     }
 
     if (errors.items) {
+      console.log(errors)
       setErrors(prev => ({ ...prev, items: undefined }));
     }
-    
+
     // Reset select value
     setSelectedProductId('');
   };
 
-  const removeItem = (productId: number) => {
+  const removeItem = (productId: string) => {
     setItems(prev => {
       const newItems = prev.filter(item => item.product_id !== productId);
       console.log('Removing item, new items:', newItems);
@@ -95,7 +98,7 @@ export function QuotationForm() {
     setUpdateKey(prev => prev + 1);
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity < 1) {
       removeItem(productId);
       return;
@@ -109,7 +112,7 @@ export function QuotationForm() {
     setItems(prev => {
       const newItems = prev.map(item =>
         item.product_id === productId
-          ? { ...item, quantity }
+          ? { ...item, quantity, unit_price: item.product.price }
           : item
       );
       console.log('Updating quantity, new items:', newItems);
@@ -119,7 +122,7 @@ export function QuotationForm() {
   };
 
   const calculateTotal = () => {
-    return safeArray(items).reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return safeArray(items).reduce((total, item) => total + (item.unit_price * item.quantity), 0);
   };
 
   const validateForm = (): boolean => {
@@ -159,6 +162,7 @@ export function QuotationForm() {
         items: items.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
+          unit_price: item.unit_price,
         })),
       }, state.token);
 
@@ -261,7 +265,7 @@ export function QuotationForm() {
                   <SelectContent>
                     {availableProducts.length > 0 ? (
                       availableProducts.map((product) => (
-                        <SelectItem key={product.id} value={product.id.toString()}>
+                        <SelectItem key={product.id} value={product.id}>
                           <div className="flex items-center justify-between w-full">
                             <span>{product.name}</span>
                             <span className="ml-2 text-sm text-muted-foreground">
@@ -291,7 +295,7 @@ export function QuotationForm() {
                       <div className="flex-1">
                         <h4 className="font-medium">{item.product.name}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(item.product.price)} each • {item.product.stock_quantity} available
+                          {formatCurrency(item.unit_price)} each • {item.product.stock_quantity} available
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -360,12 +364,12 @@ export function QuotationForm() {
                     <div className="flex-1">
                       <p className="font-medium">{item.product.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {item.quantity} × {formatCurrency(item.product.price)}
+                        {item.quantity} × {formatCurrency(item.unit_price)}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        {formatCurrency(item.product.price * item.quantity)}
+                        {formatCurrency(item.unit_price * item.quantity)}
                       </p>
                     </div>
                   </div>

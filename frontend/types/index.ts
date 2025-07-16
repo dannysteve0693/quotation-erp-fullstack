@@ -1,16 +1,26 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
-  first_name: string;
-  last_name: string;
-  phone?: string;
+  password_hash: string;
   role: 'customer' | 'sales';
   created_at: string;
   updated_at: string;
 }
 
+export interface Customer {
+  id: string;
+  user_id: string;
+  name: string;
+  contact_person?: string;
+  phone_number?: string;
+  address?: string;
+  created_at: string;
+  updated_at: string;
+  user?: User;
+}
+
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -20,43 +30,52 @@ export interface Product {
 }
 
 export interface QuotationItem {
-  id: number;
-  quotation_id: number;
-  product_id: number;
+  id: string;
+  quotation_id: string;
+  product_id: string;
   quantity: number;
   unit_price: number;
-  total_price: number;
+  sub_total: number;
   product?: Product;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Quotation {
-  id: number;
-  customer_id: number;
-  total_amount: number;
+  id: string;
+  quotation_number: string;
+  customer_id: string;
   status: 'pending' | 'approved' | 'rejected' | 'converted_to_order';
+  total_amount: number;
+  created_by?: string;
+  approved_by?: string;
   created_at: string;
   updated_at: string;
+  approved_at?: string;
   customer?: User;
   items: QuotationItem[];
   audit_trail?: AuditTrail[];
 }
 
 export interface AuditTrail {
-  id: number;
-  quotation_id: number;
-  changed_by: number;
-  previous_status: string;
-  new_status: string;
+  id: string;
+  quotation_id: string;
+  event_type: 'created' | 'status_change' | 'approved' | 'rejected' | 'converted_to_order';
+  old_status?: 'pending' | 'approved' | 'rejected' | 'converted_to_order';
+  new_status?: 'pending' | 'approved' | 'rejected' | 'converted_to_order';
+  changed_by?: string;
+  change_reason?: string;
   changed_at: string;
   user?: User;
 }
 
 export interface SalesOrder {
-  id: number;
-  quotation_id: number;
-  customer_id: number;
+  id: string;
+  quotation_id: string;
+  customer_id: string;
+  order_date: string;
   total_amount: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  created_by?: string;
   created_at: string;
   updated_at: string;
   customer?: User;
@@ -65,13 +84,15 @@ export interface SalesOrder {
 }
 
 export interface SalesOrderItem {
-  id: number;
-  sales_order_id: number;
-  product_id: number;
+  id: string;
+  sales_order_id: string;
+  product_id: string;
   quantity: number;
   unit_price: number;
-  total_price: number;
+  sub_total: number;
   product?: Product;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthResponse {
@@ -107,7 +128,8 @@ export interface CreateProductData {
 
 export interface CreateQuotationData {
   items: {
-    product_id: number;
+    product_id: string;
     quantity: number;
+    unit_price: number;
   }[];
 }

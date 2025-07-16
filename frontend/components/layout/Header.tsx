@@ -51,7 +51,7 @@ export function Header() {
           <div className="flex items-center space-x-4">
             <div className="hidden sm:flex items-center space-x-2 text-sm text-muted-foreground">
               <User className="h-4 w-4" />
-              <span>{state.user.first_name} {state.user.last_name}</span>
+              <span>{state.user.email}</span>
               <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
                 {state.user.role}
               </span>
@@ -105,7 +105,7 @@ export function Header() {
           {/* Mobile User Info */}
           <div className="mt-2 flex items-center space-x-2 text-sm text-muted-foreground">
             <User className="h-4 w-4" />
-            <span>{state.user.first_name} {state.user.last_name}</span>
+            <span>{state.user.email}</span>
             <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
               {state.user.role}
             </span>

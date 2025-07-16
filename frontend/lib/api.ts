@@ -93,7 +93,7 @@ class ApiClient {
     return this.handleResponse<Product>(response);
   }
 
-  async updateProduct(id: number, data: Partial<CreateProductData>, token: string): Promise<Product> {
+  async updateProduct(id: string, data: Partial<CreateProductData>, token: string): Promise<Product> {
     const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: 'PUT',
       headers: this.getHeaders(token),
@@ -103,7 +103,7 @@ class ApiClient {
     return this.handleResponse<Product>(response);
   }
 
-  async deleteProduct(id: number, token: string): Promise<void> {
+  async deleteProduct(id: string, token: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: 'DELETE',
       headers: this.getHeaders(token),
@@ -125,7 +125,7 @@ class ApiClient {
     return this.handleArrayResponse<Quotation>(response);
   }
 
-  async getQuotationById(id: number, token: string): Promise<Quotation> {
+  async getQuotationById(id: string, token: string): Promise<Quotation> {
     const response = await fetch(`${API_BASE_URL}/quotations/${id}`, {
       method: 'GET',
       headers: this.getHeaders(token),
@@ -144,7 +144,7 @@ class ApiClient {
     return this.handleResponse<Quotation>(response);
   }
 
-  async approveQuotation(id: number, token: string): Promise<Quotation> {
+  async approveQuotation(id: string, token: string): Promise<Quotation> {
     const response = await fetch(`${API_BASE_URL}/quotations/${id}/approve`, {
       method: 'PUT',
       headers: this.getHeaders(token),
@@ -154,7 +154,7 @@ class ApiClient {
     return this.handleResponse<Quotation>(response);
   }
 
-  async rejectQuotation(id: number, token: string): Promise<Quotation> {
+  async rejectQuotation(id: string, token: string): Promise<Quotation> {
     const response = await fetch(`${API_BASE_URL}/quotations/${id}/approve`, {
       method: 'PUT',
       headers: this.getHeaders(token),
@@ -174,7 +174,7 @@ class ApiClient {
     return this.handleArrayResponse<SalesOrder>(response);
   }
 
-  async getSalesOrderById(id: number, token: string): Promise<SalesOrder> {
+  async getSalesOrderById(id: string, token: string): Promise<SalesOrder> {
     const response = await fetch(`${API_BASE_URL}/sales-orders/${id}`, {
       method: 'GET',
       headers: this.getHeaders(token),
@@ -183,7 +183,7 @@ class ApiClient {
     return this.handleResponse<SalesOrder>(response);
   }
 
-  async createSalesOrderFromQuotation(quotationId: number, token: string): Promise<SalesOrder> {
+  async createSalesOrderFromQuotation(quotationId: string, token: string): Promise<SalesOrder> {
     const response = await fetch(`${API_BASE_URL}/sales-orders/from-quotation/${quotationId}`, {
       method: 'POST',
       headers: this.getHeaders(token),
@@ -192,7 +192,7 @@ class ApiClient {
     return this.handleResponse<SalesOrder>(response);
   }
 
-  async updateSalesOrderStatus(id: number, status: string, token: string): Promise<SalesOrder> {
+  async updateSalesOrderStatus(id: string, status: string, token: string): Promise<SalesOrder> {
     const response = await fetch(`${API_BASE_URL}/sales-orders/${id}/status`, {
       method: 'PUT',
       headers: this.getHeaders(token),
