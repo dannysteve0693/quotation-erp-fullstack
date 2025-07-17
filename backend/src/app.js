@@ -21,8 +21,8 @@ const limiter = rateLimit({
 });
 
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://your-frontend-domain.com'
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.FRONTEND_URL, 'http://localhost:3001', 'http://localhost:5173']
     : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -60,7 +60,7 @@ app.use('*', (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
-  
+
   if (err.name === 'SequelizeValidationError') {
     return res.status(400).json({
       error: 'Validation error',
@@ -70,7 +70,7 @@ app.use((err, req, res, next) => {
       }))
     });
   }
-  
+
   if (err.name === 'SequelizeUniqueConstraintError') {
     return res.status(409).json({
       error: 'Duplicate entry',
@@ -80,7 +80,7 @@ app.use((err, req, res, next) => {
       }))
     });
   }
-  
+
   res.status(500).json({
     error: 'Internal server error'
   });
@@ -89,12 +89,12 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   try {
     await testConnection();
-    
+
     if (process.env.NODE_ENV !== 'production') {
       await sequelize.sync({ alter: true });
       console.log('✅ Database synchronized successfully.');
     }
-    
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
