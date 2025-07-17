@@ -1,18 +1,17 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database for Development
   postgres:
     image: postgres:15-alpine
-    container_name: erp-postgres
+    container_name: erp-postgres-dev
     restart: unless-stopped
     environment:
-      POSTGRES_DB: erp_quotation
+      POSTGRES_DB: erp_quotation_dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - postgres_dev_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -21,61 +20,59 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - erp-network
+      - erp-dev-network
 
-  # Backend API
-  backend:
-    build: .
-    container_name: erp-backend
+  # Backend API for Development
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-backend-dev
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/erp_quotation
-      JWT_SECRET: your-super-secure-jwt-secret-change-this-in-production
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres.uywhfffsdgwxhiqluzxv:NOH5kdT2L2o8baKH@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+      JWT_SECRET: 3d24379807562d988f83aac5ea320684
       JWT_EXPIRATION: 24h
       PORT: 3000
       FRONTEND_URL: http://localhost:3001
     ports:
       - "3000:3000"
     volumes:
-      - ./src:/app/src:ro
-      - ./logs:/app/logs
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - /app/node_modules
     networks:
-      - erp-network
+      - erp-dev-network
 
-  # pgAdmin (Optional - for database management)
-  pgadmin:
+  # pgAdmin for Development
+  pgadmin-dev:
     image: dpage/pgadmin4:latest
-    container_name: erp-pgadmin
+    container_name: erp-pgadmin-dev
     restart: unless-stopped
     depends_on:
       - postgres
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin123
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "5050:80"
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - pgadmin_dev_data:/var/lib/pgadmin
     networks:
-      - erp-network
+      - erp-dev-network
 
 volumes:
-  postgres_data:
+  postgres_dev_data:
     driver: local
-  pgadmin_data:
+  pgadmin_dev_data:
     driver: local
 
 networks:
-  erp-network:
+  erp-dev-network:
     driver: bridge
