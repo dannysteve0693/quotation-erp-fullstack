@@ -69,6 +69,9 @@ export function Dashboard() {
     navigateTo('sales-order-detail');
   };
 
+
+  console.log('quotations:', quotations);
+
   const pendingQuotations = safeFilter(quotations, q => q.status === 'pending');
   const recentQuotations = safeArray(quotations).slice(0, 5);
   const recentSalesOrders = safeArray(salesOrders).slice(0, 5);
@@ -94,7 +97,8 @@ export function Dashboard() {
     }] : []),
     {
       title: 'Total Value',
-      value: formatCurrency(safeReduce(quotations, (sum, q) => sum + q.total_amount, 0)),
+      value: formatCurrency(safeReduce(quotations, (sum, q) => {
+        return sum + Number(q.total_amount)}, 0)),
       icon: TrendingUp,
       description: 'All quotations',
     },

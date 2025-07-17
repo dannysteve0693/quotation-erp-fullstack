@@ -28,25 +28,11 @@ export function SalesOrderDetail() {
     setIsLoading(true);
     try {
       const data = await apiClient.getSalesOrderById(state.selectedSalesOrderId, state.token);
-      setSalesOrder(data);
+      setSalesOrder(data?.salesOrder);
     } catch (error) {
       console.error('Failed to load sales order:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (newStatus: string) => {
-    if (!salesOrder || !state.token) return;
-
-    setIsUpdatingStatus(true);
-    try {
-      const updatedOrder = await apiClient.updateSalesOrderStatus(salesOrder.id, newStatus, state.token);
-      setSalesOrder(updatedOrder);
-    } catch (error) {
-      console.error('Failed to update sales order status:', error);
-    } finally {
-      setIsUpdatingStatus(false);
     }
   };
 

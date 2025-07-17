@@ -11,11 +11,13 @@ import { QuotationForm } from '@/components/quotations/QuotationForm';
 import { QuotationList } from '@/components/quotations/QuotationList';
 import { QuotationDetail } from '@/components/quotations/QuotationDetail';
 import { SalesOrderDetail } from '@/components/sales-orders/SalesOrderDetail';
+import { SalesOrderList } from '@/components/sales-orders/SalesOrderList';
 
 function AppContent() {
   const { state } = useApp();
 
   const renderCurrentPage = () => {
+    console.log('Current Page:', state.currentPage);
     if (!state.user) {
       switch (state.currentPage) {
         case 'login':
@@ -40,6 +42,8 @@ function AppContent() {
         return <QuotationDetail />;
       case 'sales-order-detail':
         return <SalesOrderDetail />;
+      case 'sales-order-list':
+        return <SalesOrderList />;
       default:
         return <Dashboard />;
     }

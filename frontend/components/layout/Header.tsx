@@ -16,6 +16,7 @@ export function Header() {
     { id: 'dashboard', label: 'Dashboard', icon: Home, show: true },
     { id: 'products', label: 'Products', icon: Package, show: state.user.role === 'sales' },
     { id: 'quotations', label: 'Quotations', icon: FileText, show: true },
+    { id: 'sales-order-list', label: 'Sales Order', icon: FileText, show: state.user.role === 'sales' },
   ];
 
   return (

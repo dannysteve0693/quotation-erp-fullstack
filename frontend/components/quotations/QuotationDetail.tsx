@@ -27,7 +27,7 @@ export function QuotationDetail() {
     setIsLoading(true);
     try {
       const data = await apiClient.getQuotationById(state.selectedQuotationId, state.token);
-      setQuotation(data);
+      setQuotation(data?.quotation || null);
     } catch (error) {
       console.error('Failed to load quotation:', error);
     } finally {

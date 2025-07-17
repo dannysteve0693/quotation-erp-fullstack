@@ -61,6 +61,13 @@ export interface Quotation {
   auditTrail?: AuditTrail[];
 }
 
+
+export interface QuotationDetailApiResponse {
+  quotation: Quotation;
+}
+
+
+
 export interface AuditTrail {
   id: string;
   quotation_id: string;
@@ -86,6 +93,11 @@ export interface SalesOrder {
   quotation?: Quotation;
   items: SalesOrderItem[];
 }
+
+export interface SalesOrderDetailApiResponse {
+  salesOrder: SalesOrder;
+}
+
 
 export interface SalesOrderItem {
   id: string;

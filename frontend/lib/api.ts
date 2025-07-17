@@ -8,6 +8,8 @@ import {
   RegisterData, 
   CreateProductData, 
   CreateQuotationData,
+  SalesOrderDetailApiResponse,
+  QuotationDetailApiResponse,
   ApiError 
 } from '@/types';
 
@@ -125,13 +127,13 @@ class ApiClient {
     return this.handleArrayResponse<Quotation>(response);
   }
 
-  async getQuotationById(id: string, token: string): Promise<Quotation> {
+  async getQuotationById(id: string, token: string): Promise<QuotationDetailApiResponse> {
     const response = await fetch(`${API_BASE_URL}/quotations/${id}`, {
       method: 'GET',
       headers: this.getHeaders(token),
     });
 
-    return this.handleResponse<Quotation>(response);
+    return this.handleResponse<QuotationDetailApiResponse>(response);
   }
 
   async createQuotation(data: CreateQuotationData, token: string): Promise<Quotation> {
@@ -174,13 +176,13 @@ class ApiClient {
     return this.handleArrayResponse<SalesOrder>(response);
   }
 
-  async getSalesOrderById(id: string, token: string): Promise<SalesOrder> {
+  async getSalesOrderById(id: string, token: string): Promise<SalesOrderDetailApiResponse> {
     const response = await fetch(`${API_BASE_URL}/sales-orders/${id}`, {
       method: 'GET',
       headers: this.getHeaders(token),
     });
 
-    return this.handleResponse<SalesOrder>(response);
+    return this.handleResponse<SalesOrderDetailApiResponse>(response);
   }
 
   async createSalesOrderFromQuotation(quotationId: string, token: string): Promise<SalesOrder> {

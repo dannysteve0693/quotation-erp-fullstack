@@ -19,8 +19,8 @@ interface FormErrors {
 export function LoginForm() {
   const { login, navigateTo } = useApp();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'admin@quotation-erp.com',
+    password: 'password123',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +90,13 @@ export function LoginForm() {
             <CardDescription className="text-center">
               Enter your email and password to access your account
             </CardDescription>
+            <CardDescription className='text-center'>
+              <br/>
+              emily.davis@startuptech.com as customer / 
+              <br/>admin@quotation-erp.com as sales
+              <br/>
+              Password is password123
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -100,11 +107,12 @@ export function LoginForm() {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="john@example.com"
+                  placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleInputChange('email')}
                   className={errors.email ? 'border-red-500' : ''}
@@ -120,7 +128,7 @@ export function LoginForm() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder="password123"
                     value={formData.password}
                     onChange={handleInputChange('password')}
                     className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}

@@ -13,7 +13,8 @@ type Page =
   | 'quotations' 
   | 'quotation-form' 
   | 'quotation-detail' 
-  | 'sales-order-detail';
+  | 'sales-order-detail'
+  | 'sales-order-list';
 
 interface AppState {
   user: User | null;
